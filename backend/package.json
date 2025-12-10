@@ -48,7 +48,6 @@
     "multer": "^1.4.5-lts.1",
     "@aws-sdk/client-s3": "^3.658.1",
     "dxf": "^4.5.0",
-    "dxf-writer": "^2.1.2",
     "openai": "^4.67.1",
     "bullmq": "^5.15.0",
     "ioredis": "^5.4.1",

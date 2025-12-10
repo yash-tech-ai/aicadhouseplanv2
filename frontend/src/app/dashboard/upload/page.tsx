@@ -23,6 +23,7 @@ export default function UploadPage() {
     categoryId: '',
     region: '',
     state: '',
+    isStandard: false,
   });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -78,6 +79,7 @@ export default function UploadPage() {
     uploadFormData.append('categoryId', formData.categoryId);
     uploadFormData.append('region', formData.region);
     uploadFormData.append('state', formData.state);
+    uploadFormData.append('isStandard', formData.isStandard.toString());
 
     try {
       const drawing = await uploadDrawing(uploadFormData);
@@ -231,6 +233,24 @@ export default function UploadPage() {
                 <option value="villa">Villa</option>
                 <option value="apartment">Apartment</option>
               </select>
+            </div>
+
+            <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <input
+                type="checkbox"
+                id="isStandard"
+                checked={formData.isStandard}
+                onChange={(e) => setFormData({ ...formData, isStandard: e.target.checked })}
+                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <div>
+                <Label htmlFor="isStandard" className="cursor-pointer font-medium text-blue-900">
+                  Mark as Standard/Template Drawing
+                </Label>
+                <p className="text-xs text-blue-700 mt-1">
+                  Standard drawings will be used as templates for matching with new uploads
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>

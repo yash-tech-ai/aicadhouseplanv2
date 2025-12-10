@@ -1,30 +1,25 @@
 module.exports = function (options, webpack) {
+  const lazyImports = [
+    '@mapbox/node-pre-gyp',
+    'mock-aws-s3',
+    'aws-sdk',
+    'nock',
+  ];
+
   return {
     ...options,
-    externals: {
-      // Ignore bcrypt's optional dependencies
-      'mock-aws-s3': 'mock-aws-s3',
-      'aws-sdk': 'aws-sdk',
-      'nock': 'nock',
-    },
+    externals: [
+      ...options.externals,
+      // Don't bundle bcrypt - it's a native module
+      'bcrypt',
+    ],
     plugins: [
       ...options.plugins,
-      // Ignore optional dependencies
       new webpack.IgnorePlugin({
-        checkResource(resource) {
-          const lazyImports = [
-            '@mapbox/node-pre-gyp',
-            'mock-aws-s3',
-            'aws-sdk',
-            'nock',
-          ];
-          if (!lazyImports.includes(resource)) {
-            return false;
-          }
-          try {
-            require.resolve(resource);
-          } catch (err) {
-            return true;
+        checkResource(resource, context) {
+          // Ignore all files in nw-pre-gyp directory
+          if (context && context.includes('@mapbox/node-pre-gyp')) {
+            return lazyImports.some(item => resource.includes(item) || resource.includes('nw-pre-gyp'));
           }
           return false;
         },

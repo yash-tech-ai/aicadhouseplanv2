@@ -1,29 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
-import * as DxfParser from 'dxf-parser';
 
 @Injectable()
 export class CadParserService {
-  private parser: any;
-
-  constructor() {
-    this.parser = new DxfParser();
-  }
+  constructor() {}
 
   async parseDXF(filePath: string): Promise<any> {
     try {
+      // Using dxf package for parsing
+      const dxf = require('dxf');
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      const dxf = this.parser.parseSync(fileContent);
 
-      if (!dxf) {
+      // Parse DXF content
+      const parsed = dxf.parseString(fileContent);
+
+      if (!parsed) {
         throw new Error('Failed to parse DXF file');
       }
 
+      // Return structured data
       return {
-        header: dxf.header,
-        tables: dxf.tables,
-        blocks: dxf.blocks,
-        entities: dxf.entities,
+        header: parsed.header || {},
+        tables: parsed.tables || {},
+        blocks: parsed.blocks || [],
+        entities: parsed.entities || [],
       };
     } catch (error) {
       throw new Error(`DXF parsing error: ${error.message}`);

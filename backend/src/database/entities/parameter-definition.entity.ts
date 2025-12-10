@@ -1,6 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { ParameterDataType } from './drawing-parameter.entity';
 
+// Re-export for convenience
+export { ParameterDataType } from './drawing-parameter.entity';
+
 @Entity('parameter_definitions')
 export class ParameterDefinition {
   @PrimaryGeneratedColumn('uuid')

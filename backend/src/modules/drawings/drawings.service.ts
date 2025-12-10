@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StandardDrawing, DrawingStatus } from '@/database/entities/standard-drawing.entity';
 import { DrawingCategory } from '@/database/entities/drawing-category.entity';
-import { DrawingParameter } from '@/database/entities/drawing-parameter.entity';
+import { DrawingParameter, ParameterDataType } from '@/database/entities/drawing-parameter.entity';
 import { FileStorageService } from './services/file-storage.service';
 import { CadService } from '../cad/cad.service';
 import { ValidationService } from '../rules/services/validation.service';
@@ -190,7 +190,7 @@ export class DrawingsService {
         drawingId,
         parameterName: key,
         parameterValue: String(value),
-        dataType: typeof value === 'number' ? 'numeric' : 'text',
+        dataType: typeof value === 'number' ? ParameterDataType.NUMERIC : ParameterDataType.TEXT,
       });
     });
 

@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { RulesService } from '../rules.service';
 import { RuleEngineService, RuleEvaluationResult } from './rule-engine.service';
 import { CadMetadata, CadMetadataDocument } from '@/database/schemas/cad-metadata.schema';
-import { StandardDrawing } from '@/database/entities/standard-drawing.entity';
+import { StandardDrawing, DrawingStatus } from '@/database/entities/standard-drawing.entity';
 
 export interface ValidationReport {
   drawingId: string;
@@ -111,8 +111,8 @@ export class ValidationService {
     // Update drawing with validation results
     await this.drawingRepository.update(drawingId, {
       validationScore: report.overallScore,
-      validationResults: report,
-      status: report.passed ? 'validated' : 'rejected',
+      validationResults: report as any,
+      status: report.passed ? DrawingStatus.VALIDATED : DrawingStatus.REJECTED,
     });
 
     return report;

@@ -1,7 +1,9 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Users } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, Users, Settings, FileText, BarChart } from 'lucide-react';
+import Link from 'next/link';
 
 export default function AdminPage() {
   return (
@@ -13,13 +15,130 @@ export default function AdminPage() {
         </p>
       </div>
 
+      {/* Admin Sections */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Rules Management */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <CheckCircle className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle>Validation Rules</CardTitle>
+                <CardDescription>Manage building code validation rules</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-600 mb-4">
+              Create, edit, and manage validation rules for different states and regions.
+              Configure conditions, formulas, and severity levels.
+            </p>
+            <Link href="/dashboard/admin/rules">
+              <Button className="w-full">Manage Rules</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        {/* User Management */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-green-100 rounded-lg">
+                <Users className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>Manage users and permissions</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-600 mb-4">
+              Add, edit, and remove users. Manage roles and permissions for architects
+              and administrators.
+            </p>
+            <Button className="w-full" variant="outline" disabled>
+              Coming Soon
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Parameter Definitions */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <Settings className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <CardTitle>Parameter Definitions</CardTitle>
+                <CardDescription>Define extractable parameters</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-600 mb-4">
+              Configure parameters that can be extracted from CAD files. Define data types,
+              units, and validation rules.
+            </p>
+            <Button className="w-full" variant="outline" disabled>
+              Coming Soon
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* System Statistics */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-orange-100 rounded-lg">
+                <BarChart className="h-6 w-6 text-orange-600" />
+              </div>
+              <div>
+                <CardTitle>System Statistics</CardTitle>
+                <CardDescription>View system analytics and reports</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-slate-600 mb-4">
+              View detailed statistics about drawings, validations, user activity, and
+              system performance.
+            </p>
+            <Button className="w-full" variant="outline" disabled>
+              Coming Soon
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Stats */}
       <Card>
-        <CardContent className="py-16 text-center">
-          <Users className="h-16 w-16 mx-auto mb-4 text-slate-400" />
-          <h3 className="text-lg font-semibold mb-2">Admin Dashboard</h3>
-          <p className="text-slate-600">
-            Coming soon - User management and system configuration
-          </p>
+        <CardHeader>
+          <CardTitle>Quick Stats</CardTitle>
+          <CardDescription>Overview of system activity</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <div>
+              <p className="text-2xl font-bold text-blue-600">-</p>
+              <p className="text-sm text-slate-600">Total Users</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-green-600">-</p>
+              <p className="text-sm text-slate-600">Active Rules</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-purple-600">-</p>
+              <p className="text-sm text-slate-600">Drawings Today</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-orange-600">-</p>
+              <p className="text-sm text-slate-600">Validations</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

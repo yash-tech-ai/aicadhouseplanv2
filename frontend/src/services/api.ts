@@ -148,8 +148,33 @@ class ApiService {
     return response.data;
   }
 
+  async getRule(id: string) {
+    const response = await this.api.get(`/rules/${id}`);
+    return response.data;
+  }
+
+  async createRule(data: any) {
+    const response = await this.api.post('/rules', data);
+    return response.data;
+  }
+
+  async updateRule(id: string, data: any) {
+    const response = await this.api.patch(`/rules/${id}`, data);
+    return response.data;
+  }
+
+  async deleteRule(id: string) {
+    const response = await this.api.delete(`/rules/${id}`);
+    return response.data;
+  }
+
   async validateDrawing(drawingId: string) {
     const response = await this.api.post(`/rules/validate/${drawingId}`);
+    return response.data;
+  }
+
+  async testRule(ruleData: any, testData: any) {
+    const response = await this.api.post('/rules/test', { rule: ruleData, testData });
     return response.data;
   }
 

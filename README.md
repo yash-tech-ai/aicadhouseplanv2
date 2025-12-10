@@ -73,7 +73,7 @@ A comprehensive CAD drawing management application for architects with AI-powere
 ### Backend
 - **Framework**: NestJS (TypeScript)
 - **Databases**: PostgreSQL + MongoDB
-- **CAD Processing**: dxf-parser, @tarikjabiri/dxf
+- **CAD Processing**: dxf-parser, dxf (v4.5.0)
 - **Rule Engine**: Custom JSON-based rule engine
 - **AI/ML**: OpenAI API for suggestions
 

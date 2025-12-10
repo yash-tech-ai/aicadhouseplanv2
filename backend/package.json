@@ -48,7 +48,7 @@
     "multer": "^1.4.5-lts.1",
     "@aws-sdk/client-s3": "^3.490.0",
     "dxf-parser": "^1.2.1",
-    "@tarikjabiri/dxf": "^0.4.0",
+    "dxf": "^4.5.0",
     "openai": "^4.24.1",
     "bullmq": "^5.1.5",
     "ioredis": "^5.3.2",

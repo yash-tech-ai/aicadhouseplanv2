@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cad_postgres
+    environment:
+      POSTGRES_DB: cad_house_plan
+      POSTGRES_USER: caduser
+      POSTGRES_PASSWORD: cadpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cad_network
+
+  mongodb:
+    image: mongo:7
+    container_name: cad_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: caduser
+      MONGO_INITDB_ROOT_PASSWORD: cadpassword
+      MONGO_INITDB_DATABASE: cad_metadata
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - cad_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: cad_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cad_network
+
+  minio:
+    image: minio/minio:latest
+    container_name: cad_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: caduser
+      MINIO_ROOT_PASSWORD: cadpassword123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - cad_network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  minio_data:
+
+networks:
+  cad_network:
+    driver: bridge

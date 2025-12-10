@@ -45,6 +45,9 @@ export default function UploadPage() {
       'application/dxf': ['.dxf'],
       'application/dwg': ['.dwg'],
       'application/octet-stream': ['.dxf', '.dwg'],
+      'image/png': ['.png'],
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'application/pdf': ['.pdf'],
     },
     maxFiles: 1,
   });
@@ -103,8 +106,8 @@ export default function UploadPage() {
         {/* File Upload */}
         <Card>
           <CardHeader>
-            <CardTitle>Select CAD File</CardTitle>
-            <CardDescription>Supported formats: DXF, DWG</CardDescription>
+            <CardTitle>Select File</CardTitle>
+            <CardDescription>Supported formats: DXF, DWG, PNG, JPG, JPEG, PDF</CardDescription>
           </CardHeader>
           <CardContent>
             {!selectedFile ? (
@@ -123,10 +126,13 @@ export default function UploadPage() {
                 ) : (
                   <>
                     <p className="text-slate-700 font-medium mb-2">
-                      Drag and drop your CAD file here, or click to browse
+                      Drag and drop your drawing file here, or click to browse
                     </p>
                     <p className="text-sm text-slate-500">
-                      Supports .dxf and .dwg files up to 50MB
+                      CAD files (.dxf, .dwg), Images (.png, .jpg, .jpeg), or PDFs up to 50MB
+                    </p>
+                    <p className="text-xs text-blue-600 mt-2">
+                      ✨ AI-powered: Images and PDFs will have parameters automatically extracted using OCR
                     </p>
                   </>
                 )}

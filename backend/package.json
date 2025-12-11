@@ -37,7 +37,6 @@
     "@nestjs/platform-express": "^10.4.4",
     "@nestjs/swagger": "^7.4.2",
     "@nestjs/typeorm": "^10.0.2",
-    "@tensorflow/tfjs-node": "^4.22.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.15.0",
     "class-transformer": "^0.5.1",

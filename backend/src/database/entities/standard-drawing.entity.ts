@@ -69,6 +69,9 @@ export class StandardDrawing {
   @Column({ default: 0 })
   matchCount: number;
 
+  @Column({ default: false })
+  isStandard: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 

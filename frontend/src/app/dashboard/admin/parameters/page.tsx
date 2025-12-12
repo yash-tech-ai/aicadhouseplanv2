@@ -34,7 +34,8 @@ import {
   Calendar,
   Database,
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+import apiClient from '@/services/api';
 
 interface Parameter {
   id: string;
@@ -91,96 +92,9 @@ export default function ParameterDefinitionsPage() {
   const fetchParameters = async () => {
     try {
       setIsLoading(true);
-      // Mock data - replace with actual API call
-      const mockParameters: Parameter[] = [
-        {
-          id: '1',
-          name: 'plot_area',
-          displayName: 'Plot Area',
-          description: 'Total area of the plot in square feet',
-          dataType: 'numeric',
-          unit: 'sq ft',
-          isRequired: true,
-          isExtractable: true,
-          category: 'dimensions',
-          validationRules: { min: 100, max: 50000 },
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          name: 'num_bedrooms',
-          displayName: 'Number of Bedrooms',
-          description: 'Total number of bedrooms in the plan',
-          dataType: 'numeric',
-          isRequired: true,
-          isExtractable: true,
-          category: 'rooms',
-          validationRules: { min: 1, max: 10 },
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '3',
-          name: 'num_bathrooms',
-          displayName: 'Number of Bathrooms',
-          description: 'Total number of bathrooms',
-          dataType: 'numeric',
-          isRequired: true,
-          isExtractable: true,
-          category: 'rooms',
-          validationRules: { min: 1, max: 10 },
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '4',
-          name: 'num_floors',
-          displayName: 'Number of Floors',
-          description: 'Total number of floors including ground',
-          dataType: 'numeric',
-          isRequired: true,
-          isExtractable: true,
-          category: 'structure',
-          validationRules: { min: 1, max: 10 },
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '5',
-          name: 'building_height',
-          displayName: 'Building Height',
-          description: 'Total height of the building',
-          dataType: 'numeric',
-          unit: 'ft',
-          isRequired: false,
-          isExtractable: true,
-          category: 'dimensions',
-          validationRules: { min: 10, max: 200 },
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '6',
-          name: 'has_parking',
-          displayName: 'Has Parking',
-          description: 'Whether the plan includes parking',
-          dataType: 'boolean',
-          isRequired: false,
-          isExtractable: true,
-          category: 'amenities',
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '7',
-          name: 'construction_type',
-          displayName: 'Construction Type',
-          description: 'Type of construction (RCC, Steel, etc.)',
-          dataType: 'text',
-          isRequired: false,
-          isExtractable: false,
-          category: 'structure',
-          createdAt: new Date().toISOString(),
-        },
-      ];
-
-      setParameters(mockParameters);
-      setFilteredParameters(mockParameters);
+      const data = await apiClient.getParameters();
+      setParameters(data);
+      setFilteredParameters(data);
     } catch (error) {
       toast({
         title: 'Error',
@@ -248,29 +162,66 @@ export default function ParameterDefinitionsPage() {
     setIsDialogOpen(true);
   };
 
-  const handleSaveParameter = () => {
-    if (editingParameter) {
+  const handleSaveParameter = async () => {
+    try {
+      const validationRules: any = {};
+      if (paramForm.min) validationRules.min = parseFloat(paramForm.min);
+      if (paramForm.max) validationRules.max = parseFloat(paramForm.max);
+      if (paramForm.pattern) validationRules.pattern = paramForm.pattern;
+
+      const paramData = {
+        name: paramForm.name,
+        displayName: paramForm.displayName,
+        description: paramForm.description,
+        dataType: paramForm.dataType,
+        unit: paramForm.unit || undefined,
+        isRequired: paramForm.isRequired,
+        isExtractable: paramForm.isExtractable,
+        category: paramForm.category,
+        validationRules: Object.keys(validationRules).length > 0 ? validationRules : undefined,
+        defaultValue: paramForm.defaultValue || undefined,
+      };
+
+      if (editingParameter) {
+        await apiClient.updateParameter(editingParameter.id, paramData);
+        toast({
+          title: 'Parameter Updated',
+          description: `${paramForm.displayName} has been updated successfully.`,
+        });
+      } else {
+        await apiClient.createParameter(paramData);
+        toast({
+          title: 'Parameter Created',
+          description: `${paramForm.displayName} has been created successfully.`,
+        });
+      }
+      setIsDialogOpen(false);
+      fetchParameters();
+    } catch (error) {
       toast({
-        title: 'Parameter Updated',
-        description: `${paramForm.displayName} has been updated successfully.`,
-      });
-    } else {
-      toast({
-        title: 'Parameter Created',
-        description: `${paramForm.displayName} has been created successfully.`,
+        title: 'Error',
+        description: `Failed to ${editingParameter ? 'update' : 'create'} parameter`,
+        variant: 'destructive',
       });
     }
-    setIsDialogOpen(false);
-    fetchParameters();
   };
 
-  const handleDeleteParameter = (parameter: Parameter) => {
+  const handleDeleteParameter = async (parameter: Parameter) => {
     if (confirm(`Are you sure you want to delete ${parameter.displayName}?`)) {
-      toast({
-        title: 'Parameter Deleted',
-        description: `${parameter.displayName} has been deleted.`,
-      });
-      fetchParameters();
+      try {
+        await apiClient.deleteParameter(parameter.id);
+        toast({
+          title: 'Parameter Deleted',
+          description: `${parameter.displayName} has been deleted.`,
+        });
+        fetchParameters();
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to delete parameter',
+          variant: 'destructive',
+        });
+      }
     }
   };
 

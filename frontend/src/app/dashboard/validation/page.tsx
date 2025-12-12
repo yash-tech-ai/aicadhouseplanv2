@@ -16,7 +16,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import apiClient from '@/services/api';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ValidationResult {
   id: string;

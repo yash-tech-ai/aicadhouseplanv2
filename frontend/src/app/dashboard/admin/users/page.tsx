@@ -34,7 +34,8 @@ import {
   CheckCircle,
   XCircle,
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+import apiClient from '@/services/api';
 
 interface User {
   id: string;
@@ -83,60 +84,9 @@ export default function UserManagementPage() {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      // Mock data - replace with actual API call
-      const mockUsers: User[] = [
-        {
-          id: '1',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@example.com',
-          phone: '+1234567890',
-          role: 'admin',
-          company: 'ABC Architects',
-          licenseNumber: 'ARCH-12345',
-          isActive: true,
-          isVerified: true,
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          email: 'jane.smith@example.com',
-          phone: '+1234567891',
-          role: 'head_architect',
-          company: 'XYZ Design',
-          licenseNumber: 'ARCH-67890',
-          isActive: true,
-          isVerified: true,
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-        },
-        {
-          id: '3',
-          firstName: 'Bob',
-          lastName: 'Wilson',
-          email: 'bob.wilson@example.com',
-          role: 'architect',
-          company: 'DEF Studios',
-          licenseNumber: 'ARCH-11111',
-          isActive: true,
-          isVerified: false,
-          createdAt: new Date(Date.now() - 172800000).toISOString(),
-        },
-        {
-          id: '4',
-          firstName: 'Alice',
-          lastName: 'Johnson',
-          email: 'alice.j@example.com',
-          role: 'user',
-          isActive: false,
-          isVerified: true,
-          createdAt: new Date(Date.now() - 259200000).toISOString(),
-        },
-      ];
-
-      setUsers(mockUsers);
-      setFilteredUsers(mockUsers);
+      const data = await apiClient.getUsers();
+      setUsers(data);
+      setFilteredUsers(data);
     } catch (error) {
       toast({
         title: 'Error',
@@ -198,29 +148,59 @@ export default function UserManagementPage() {
     setIsDialogOpen(true);
   };
 
-  const handleSaveUser = () => {
-    if (editingUser) {
+  const handleSaveUser = async () => {
+    try {
+      if (editingUser) {
+        // Update user role
+        await apiClient.updateUserRole(editingUser.id, userForm.role);
+
+        // Toggle status if changed
+        if (editingUser.isActive !== userForm.isActive) {
+          await apiClient.toggleUserStatus(editingUser.id);
+        }
+
+        toast({
+          title: 'User Updated',
+          description: `${userForm.firstName} ${userForm.lastName} has been updated successfully.`,
+        });
+      } else {
+        // Note: User creation is done through registration endpoint
+        toast({
+          title: 'Info',
+          description: 'New users must register through the registration page.',
+          variant: 'default',
+        });
+      }
+      setIsDialogOpen(false);
+      fetchUsers();
+    } catch (error) {
       toast({
-        title: 'User Updated',
-        description: `${userForm.firstName} ${userForm.lastName} has been updated successfully.`,
-      });
-    } else {
-      toast({
-        title: 'User Created',
-        description: `${userForm.firstName} ${userForm.lastName} has been created successfully.`,
+        title: 'Error',
+        description: 'Failed to update user',
+        variant: 'destructive',
       });
     }
-    setIsDialogOpen(false);
-    fetchUsers();
   };
 
-  const handleDeleteUser = (user: User) => {
+  const handleDeleteUser = async (user: User) => {
     if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
-      toast({
-        title: 'User Deleted',
-        description: `${user.firstName} ${user.lastName} has been deleted.`,
-      });
-      fetchUsers();
+      try {
+        // Toggle user status to inactive (soft delete)
+        if (user.isActive) {
+          await apiClient.toggleUserStatus(user.id);
+          toast({
+            title: 'User Deactivated',
+            description: `${user.firstName} ${user.lastName} has been deactivated.`,
+          });
+          fetchUsers();
+        }
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to deactivate user',
+          variant: 'destructive',
+        });
+      }
     }
   };
 

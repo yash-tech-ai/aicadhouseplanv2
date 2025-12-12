@@ -159,7 +159,7 @@ class ApiService {
   }
 
   async updateRule(id: string, data: any) {
-    const response = await this.api.patch(`/rules/${id}`, data);
+    const response = await this.api.put(`/rules/${id}`, data);
     return response.data;
   }
 
@@ -191,6 +191,31 @@ class ApiService {
 
   async createParameter(data: any) {
     const response = await this.api.post('/admin/parameters', data);
+    return response.data;
+  }
+
+  async updateParameter(id: string, data: any) {
+    const response = await this.api.put(`/admin/parameters/${id}`, data);
+    return response.data;
+  }
+
+  async deleteParameter(id: string) {
+    const response = await this.api.delete(`/admin/parameters/${id}`);
+    return response.data;
+  }
+
+  async getUsers() {
+    const response = await this.api.get('/admin/users');
+    return response.data;
+  }
+
+  async updateUserRole(id: string, role: string) {
+    const response = await this.api.put(`/admin/users/${id}/role`, { role });
+    return response.data;
+  }
+
+  async toggleUserStatus(id: string) {
+    const response = await this.api.put(`/admin/users/${id}/toggle-status`);
     return response.data;
   }
 }

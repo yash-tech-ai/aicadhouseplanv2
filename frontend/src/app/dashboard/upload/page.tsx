@@ -72,11 +72,25 @@ export default function UploadPage() {
       return;
     }
 
+    // Get user from localStorage
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+
+    if (!user?.id) {
+      toast({
+        title: 'Error',
+        description: 'User not found. Please log in again.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const uploadFormData = new FormData();
     uploadFormData.append('file', selectedFile);
     uploadFormData.append('name', formData.name);
     uploadFormData.append('description', formData.description);
     uploadFormData.append('categoryId', formData.categoryId);
+    uploadFormData.append('uploaderId', user.id);
     uploadFormData.append('region', formData.region);
     uploadFormData.append('state', formData.state);
     uploadFormData.append('isStandard', formData.isStandard.toString());

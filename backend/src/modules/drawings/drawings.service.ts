@@ -7,6 +7,7 @@ import { DrawingParameter, ParameterDataType } from '@/database/entities/drawing
 import { FileStorageService } from './services/file-storage.service';
 import { CadService } from '../cad/cad.service';
 import { ValidationService } from '../rules/services/validation.service';
+import { ImageProcessorService } from '../cad/services/image-processor.service';
 
 export interface CreateDrawingDto {
   name: string;
@@ -16,6 +17,7 @@ export interface CreateDrawingDto {
   region?: string;
   state?: string;
   parameters?: Record<string, any>;
+  isStandard?: boolean;
 }
 
 @Injectable()
@@ -30,6 +32,7 @@ export class DrawingsService {
     private fileStorageService: FileStorageService,
     private cadService: CadService,
     private validationService: ValidationService,
+    private imageProcessorService: ImageProcessorService,
   ) {}
 
   async uploadDrawing(
@@ -38,6 +41,10 @@ export class DrawingsService {
   ): Promise<StandardDrawing> {
     // Upload file to storage
     const filePath = await this.fileStorageService.uploadFile(file);
+
+    // Detect file type
+    const fileExtension = file.originalname.split('.').pop()?.toLowerCase();
+    const isImageOrPdf = ['png', 'jpg', 'jpeg', 'pdf'].includes(fileExtension || '');
 
     // Create drawing entry
     const drawing = this.drawingRepository.create({
@@ -49,14 +56,48 @@ export class DrawingsService {
       region: data.region,
       state: data.state,
       status: DrawingStatus.PROCESSING,
+      isStandard: data.isStandard || false,
     });
 
     const savedDrawing = await this.drawingRepository.save(drawing);
 
-    // Process CAD file in background
-    await this.cadService.processCADFile(savedDrawing.id, filePath);
+    // Process file based on type
+    if (isImageOrPdf) {
+      // Process image/PDF with AI
+      try {
+        const processingResult = await this.imageProcessorService.processFile(filePath);
 
-    // If parameters provided, save them
+        // Save extracted parameters
+        if (processingResult.detectedParameters) {
+          const extractedParams = {
+            ...processingResult.detectedParameters,
+            ai_confidence: processingResult.confidence,
+            extracted_text: processingResult.extractedText,
+          };
+          await this.saveParameters(savedDrawing.id, extractedParams);
+        }
+
+        // Update drawing with AI metadata
+        savedDrawing.status = DrawingStatus.VALIDATED;
+        savedDrawing.validationResults = {
+          aiProcessed: true,
+          confidence: processingResult.confidence,
+          dimensions: processingResult.dimensions,
+          extractedText: processingResult.extractedText,
+        };
+        await this.drawingRepository.save(savedDrawing);
+      } catch (error) {
+        console.error('Image processing error:', error);
+        await this.drawingRepository.update(savedDrawing.id, {
+          status: DrawingStatus.REJECTED,
+        });
+      }
+    } else {
+      // Process CAD file in background
+      await this.cadService.processCADFile(savedDrawing.id, filePath);
+    }
+
+    // If manual parameters provided, save them
     if (data.parameters) {
       await this.saveParameters(savedDrawing.id, data.parameters);
     }

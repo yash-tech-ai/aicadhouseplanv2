@@ -24,7 +24,7 @@ export class DrawingsController {
   constructor(private readonly drawingsService: DrawingsService) {}
 
   @Post('upload')
-  @ApiOperation({ summary: 'Upload a new CAD drawing' })
+  @ApiOperation({ summary: 'Upload a new CAD drawing, image, or PDF' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   async uploadDrawing(
@@ -32,7 +32,7 @@ export class DrawingsController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 52428800 }), // 50MB
-          new FileTypeValidator({ fileType: /(dxf|dwg)$/ }),
+          new FileTypeValidator({ fileType: /(dxf|dwg|png|jpg|jpeg|pdf)$/i }),
         ],
       }),
     )

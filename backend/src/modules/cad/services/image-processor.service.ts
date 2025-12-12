@@ -89,6 +89,21 @@ export class ImageProcessorService {
   }
 
   /**
+   * Process file (auto-detect type and route to appropriate processor)
+   */
+  async processFile(filePath: string): Promise<ImageProcessingResult> {
+    const fileInfo = this.isImageOrPDF(filePath);
+
+    if (fileInfo.type === 'image') {
+      return this.processImage(filePath);
+    } else if (fileInfo.type === 'pdf') {
+      return this.processPDF(filePath);
+    } else {
+      throw new Error(`Unsupported file type: ${fileInfo.type}`);
+    }
+  }
+
+  /**
    * Perform OCR on image
    */
   private async performOCR(imagePath: string): Promise<string> {
